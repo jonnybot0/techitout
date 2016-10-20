@@ -5,9 +5,10 @@
 import org.xml.sax.InputSource
 import javax.xml.transform.sax.SAXSource
 
+inst = jenkins.model.Jenkins.instance;
+def starterJob = inst.getItem("job1")
 (2..6).collect{"job$it"}.each{ appName->
-    inst = jenkins.model.Jenkins.instance; 
-    def newJob = inst.copy(inst.getItem("job1"), appName);
+    def newJob = inst.copy(starterJob, appName);
 
     //Update the git config for right repo
 
@@ -19,7 +20,9 @@ import javax.xml.transform.sax.SAXSource
                 "jonnybot0/${appName.toLowerCase()}.git")
 
     //Perform black magic to convert the string to XML storage object
-    def is = new InputSource(new ByteArrayInputStream(newConfig.getBytes()))
+    def is = new InputSource(
+            new ByteArrayInputStream(newConfig.getBytes())
+    )
     def source = new SAXSource(is)
     newJob.updateByXml(source)
     newJob.save()
