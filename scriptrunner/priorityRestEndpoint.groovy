@@ -1,3 +1,6 @@
+/**
+ * From example at https://scriptrunner.adaptavist.com/latest/jira/rest-endpoints.html#_create_priority_object
+ */
 @BaseScript CustomEndpointDelegate delegate
 
 def priorityManager = ComponentAccessor.getComponent(PriorityManager)
@@ -6,7 +9,7 @@ ComponentManager.instance
 
 priority(
         httpMethod: "POST", groups: ["jira-administrators"]
-) {MultivaluedMap queryParams, String body ->
+) { MultivaluedMap queryParams, String body ->
 
     def mapper = new ObjectMapper()
     def bean = mapper.readValue(body, PriorityJsonBean)
@@ -17,10 +20,12 @@ priority(
 
     Priority priority
     try {
-        priority = priorityManager.createPriority(bean.name, bean.description, bean.iconUrl, bean.statusColor)
+        priority = priorityManager.createPriority(bean.name,
+                bean.description,
+                bean.iconUrl,
+                bean.statusColor)
     } catch (e) {
         return Response.serverError().entity([error: e.message]).build();
     }
-
     return Response.created(new URI("/rest/api/2/priority/${priority.id}")).build();
 }
